@@ -12,20 +12,30 @@
 
         public void Register(IAppHost appHost)
         {
-            appHost.PreRequestFilters.Insert(0, ProcessRequest);
+            appHost.PreRequestFilters.InsertAsFirst(ProcessRequest);
         }
 
         public virtual void ProcessRequest(IRequest request, IResponse response)
         {
-            // Check for existance of header. If not there add it in
+            // Check for existence of header. If not there add it in
             var requestId = request.Headers[HeaderName];
             if (string.IsNullOrWhiteSpace(requestId))
             {
-                requestId = GenerateRequestId();
-                request.Headers[HeaderName] = requestId;
+                requestId = SetRequestId(request);
             }
 
-            // Ensure it's in the response too
+            SetResponseId(response, requestId);
+        }
+
+        private string SetRequestId(IRequest request)
+        {
+            var requestId = GenerateRequestId();
+            request.Headers[HeaderName] = requestId;
+            return requestId;
+        }
+
+        private void SetResponseId(IResponse response, string requestId)
+        {
             response.AddHeader(HeaderName, requestId);
         }
 

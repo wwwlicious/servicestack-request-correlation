@@ -72,6 +72,18 @@
         }
 
         [Fact]
+        public void ProcessRequest_UsesCustomHeaderName_IfSet()
+        {
+            var mockHttpRequest = new MockHttpRequest();
+
+            const string customHeader = "x-my-test-header";
+            feature.HeaderName = customHeader;
+            feature.ProcessRequest(mockHttpRequest, new MockHttpResponse());
+
+            mockHttpRequest.Headers[customHeader].Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
         public void ProcessRequest_SetsNewIdOnRequest_IfNotProvided()
         {
             var mockHttpRequest = new MockHttpRequest();
