@@ -1,0 +1,141 @@
+﻿namespace ServiceStack.Request.Correlation.Tests
+{
+    using System;
+    using FakeItEasy;
+    using FluentAssertions;
+    using Interfaces;
+    using Ploeh.AutoFixture.Xunit2;
+    using ServiceStack;
+    using Testing;
+    using Web;
+    using Xunit;
+
+    [Collection("RequestCorrelationTests")]
+    public class RequestCorrelationFeatureTests
+    {
+        private readonly RequestCorrelationFeature feature;
+        private readonly IIdentityGenerator generator;
+        private readonly string newId = Guid.NewGuid().ToString();
+
+        public RequestCorrelationFeatureTests()
+        {
+            generator = A.Fake<IIdentityGenerator>();
+            A.CallTo(() => generator.GenerateIdentity()).Returns(newId);
+            feature = new RequestCorrelationFeature { IdentityGenerator = generator };
+        }
+
+        [Fact]
+        public void Register_AddsPreRequestFilter()
+        {
+            var appHost = A.Fake<IAppHost>();
+            appHost.PreRequestFilters.Count.Should().Be(0);
+
+            feature.Register(appHost);
+
+            appHost.PreRequestFilters.Count.Should().Be(1);
+        }
+
+        [Fact]
+        public void Register_AddsPreRequestFilter_AtPosition0()
+        {
+            var appHost = A.Fake<IAppHost>();
+            Action<IRequest, IResponse> myDelegate = (request, response) => { };
+            appHost.PreRequestFilters.Add(myDelegate);
+
+            feature.Register(appHost);
+
+            appHost.PreRequestFilters[1].Should().Be(myDelegate);
+        }
+
+        [Fact]
+        public void HeaderName_HasDefaultValue()
+        {
+            var testFeature = new RequestCorrelationFeature();
+            testFeature.HeaderName.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact]
+        public void IdentityGenerator_UsesRustflakesIdentityGeneratorByDefault()
+        {
+            var testFeature = new RequestCorrelationFeature();
+            testFeature.IdentityGenerator.Should().BeOfType<RustflakesIdentityGenerator>();
+        }
+
+        [Fact]
+        public void ProcessRequest_SetsHeaderOnRequest_IfNotProvided()
+        {
+            var mockHttpRequest = new MockHttpRequest();
+
+            feature.ProcessRequest(mockHttpRequest, new MockHttpResponse());
+
+            mockHttpRequest.Headers[feature.HeaderName].Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public void ProcessRequest_SetsNewIdOnRequest_IfNotProvided()
+        {
+            var mockHttpRequest = new MockHttpRequest();
+
+            feature.ProcessRequest(mockHttpRequest, new MockHttpResponse());
+
+            mockHttpRequest.Headers[feature.HeaderName].Should().Be(newId);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void ProcessRequest_SetsNewIdOnRequest_IfProvidedButEmpty(string requestId)
+        {
+            var mockHttpRequest = new MockHttpRequest();
+            mockHttpRequest.Headers[feature.HeaderName] = requestId;
+
+            feature.ProcessRequest(mockHttpRequest, new MockHttpResponse());
+
+            mockHttpRequest.Headers[feature.HeaderName].Should().Be(newId);
+        }
+
+        [Theory, InlineAutoData]
+        public void ProcessRequest_DoesNotChangeHeaderOnRequest_IfProvided(string requestId)
+        {
+            var mockHttpRequest = new MockHttpRequest();
+            mockHttpRequest.Headers[feature.HeaderName] = requestId;
+
+            feature.ProcessRequest(mockHttpRequest, new MockHttpResponse());
+
+            mockHttpRequest.Headers[feature.HeaderName].Should().Be(requestId);
+        }
+
+        [Fact]
+        public void ProcessRequest_SetsHeaderOnResponse()
+        {
+            var mockHttpResponse = new MockHttpResponse();
+
+            feature.ProcessRequest(new MockHttpRequest(), mockHttpResponse);
+
+            mockHttpResponse.Headers[feature.HeaderName].Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public void ProcessRequest_SetsNewIdOnResponse_IfNotProvidedInRequest()
+        {
+            var mockHttpResponse = new MockHttpResponse();
+
+            feature.ProcessRequest(new MockHttpRequest(), mockHttpResponse);
+
+            mockHttpResponse.Headers[feature.HeaderName].Should().Be(newId);
+        }
+
+        [Theory, InlineAutoData]
+        public void ProcessRequest_SetsIdOnResponse_IfNotInRequest(string requestId)
+        {
+            var mockHttpResponse = new MockHttpResponse();
+            var mockHttpRequest = new MockHttpRequest();
+            mockHttpRequest.Headers[feature.HeaderName] = requestId;
+
+            feature.ProcessRequest(mockHttpRequest, mockHttpResponse);
+
+            mockHttpResponse.Headers[feature.HeaderName].Should().Be(requestId);
+        }
+    }
+}
