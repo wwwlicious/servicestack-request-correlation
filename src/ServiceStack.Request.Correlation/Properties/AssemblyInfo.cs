@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ServiceStack.Request.Correlation")]
-[assembly: AssemblyDescription("Pligun for ServiceStack that ensures there's a unique request correlation Id in header")]
+[assembly: AssemblyDescription("Plugin for ServiceStack that ensures there's a unique request correlation Id in header")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("MacLean Electrical")]
 [assembly: AssemblyProduct("ServiceStack.Request.Correlation")]

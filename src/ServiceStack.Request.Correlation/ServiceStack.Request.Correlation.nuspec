@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>ServiceStack.Request.Correlation</id>
+    <version>$version$</version>
+    <authors>Donald Gray (@donaldgray)</authors>
+    <description>Plugin for ServiceStack that ensures there's a unique request correlation Id in header</description>
+    <projectUrl></projectUrl>
+    <licenseUrl>https://opensource.org/licenses/MPL-2.0</licenseUrl>
+    <iconUrl>https://servicestack.net/img/logo-32.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>servicestack request correlation microservices</tags>
+    <releaseNotes>See github project for details</releaseNotes>
+    <dependencies>
+      <dependency id="ServiceStack" version="[4.0.54, 5)" />
+      <dependency id="ServiceStack.Client" version="[4.0.54, 5)" />
+      <dependency id="ServiceStack.Interfacesgit  " version="[4.0.54, 5)" />
+    </dependencies>
+  </metadata>
+</package>
