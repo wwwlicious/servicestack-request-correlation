@@ -8,6 +8,11 @@ The plugin is added like any other. By default it has no external dependencies t
 ```csharp
 Plugins.Add(new RequestCorrelationFeature());
 ```
+
+This will add a new http header 'x-mac-requestid' with a unique id to every request/response. If an incoming request already has a header, it will copy it to the response
+
+# Customising
+
 Both the http header name (default: "x-mac-requestid") and request id generation method (default: [RustFlakes](https://github.com/peschkaj/rustflakes)) can be customised:
 ```csharp
 Plugins.Add(new RequestCorrelationFeature
@@ -18,7 +23,7 @@ Plugins.Add(new RequestCorrelationFeature
 
 // public class MyIdentityGenerator : IIdentityGenerator {}
 ```
-Where IIdentityGenerator has a single method that needs to be implemented. This method is called each time a request id is created:
+Where `IIdentityGenerator` has a single method that needs to be implemented. This method is called each time a request id is created:
 ```csharp
 string GenerateIdentity();
 ```
