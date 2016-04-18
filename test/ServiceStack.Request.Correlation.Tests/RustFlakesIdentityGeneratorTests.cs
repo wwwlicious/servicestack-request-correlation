@@ -9,24 +9,24 @@ namespace ServiceStack.Request.Correlation.Tests
 
     public class RustflakesIdentityGeneratorTests
     {
-        private readonly RustflakesIdentityGenerator _generator;
+        private readonly RustflakesIdentityGenerator generator;
 
         public RustflakesIdentityGeneratorTests()
         {
-            _generator = new RustflakesIdentityGenerator();
+            generator = new RustflakesIdentityGenerator();
         }
 
         [Fact]
         public void GenerateIdentity_GeneratesString()
         {
-            var str = _generator.GenerateIdentity();
+            var str = generator.GenerateIdentity();
             str.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
         public void GenerateIdentity_GeneratesUnique()
         {
-            var collection = Enumerable.Range(0, 100).Select(_ => _generator.GenerateIdentity()).ToArray();
+            var collection = Enumerable.Range(0, 100).Select(_ => generator.GenerateIdentity()).ToArray();
 
             collection.Length.Should().Be(collection.Distinct().Count());
         }
