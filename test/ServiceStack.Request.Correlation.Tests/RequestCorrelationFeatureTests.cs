@@ -43,10 +43,13 @@ namespace ServiceStack.Request.Correlation.Tests
         {
             var appHost = A.Fake<IAppHost>();
             Action<IRequest, IResponse> myDelegate = (request, response) => { };
-            appHost.PreRequestFilters.Add(myDelegate);
+
+            // Add delegate at position 0
+            appHost.PreRequestFilters.Insert(0, myDelegate);
 
             feature.Register(appHost);
 
+            // After registering delegate added at 0 should now be at 1
             appHost.PreRequestFilters[1].Should().Be(myDelegate);
         }
 
