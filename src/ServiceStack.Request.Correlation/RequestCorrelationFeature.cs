@@ -2,8 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this 
 // file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 namespace ServiceStack.Request.Correlation
-{
-    using System;
+{ 
     using Interfaces;
     using Logging;
     using ServiceStack;
@@ -32,15 +31,17 @@ namespace ServiceStack.Request.Correlation
             if (string.IsNullOrWhiteSpace(correlationId))
             {
                 correlationId = IdentityGenerator.GenerateIdentity();
-                SetRequestId(request, correlationId);
+                request.Headers[HeaderName] = correlationId;
                 log.Debug($"Generated new correlation Id {correlationId} for header {HeaderName} on incoming request object");
             }
+
+            request.Items[HeaderName] = correlationId;
 
             //SetResponseId(response, correlationId);
             log.Debug($"Setting correlation Id {correlationId} to header {HeaderName} on response object");
         }
 
-        public virtual void SetResponseCorrelationId(IRequest request, IResponse response, object obj)
+        public virtual void SetResponseCorrelationId(IRequest request, IResponse response, object dto)
         {
             var correlationId = GetRequestId(request);
             SetResponseId(response, correlationId);
@@ -51,12 +52,6 @@ namespace ServiceStack.Request.Correlation
             response.AddHeader(HeaderName, requestId);
         }
 
-        private void SetRequestId(IRequest request, string requestId)
-        {
-            request.Headers[HeaderName] = requestId;
-            request.Items.Add(HeaderName, requestId);
-        }
-
         private string GetRequestId(IRequest request)
         {
             return request.Headers[HeaderName];
@@ -65,13 +60,11 @@ namespace ServiceStack.Request.Correlation
         public void AfterPluginsLoaded(IAppHost appHost)
         {
             // Check if an IServiceGatewayFactory has been registered
-            /*var factory = appHost.GetContainer().TryResolve<IServiceGatewayFactory>();
+            var factory = appHost.GetContainer().TryResolve<IServiceGatewayFactory>();
 
             var factoryBase = factory as ServiceGatewayFactoryBase;
-            if (factoryBase == null)
-                throw new ApplicationException("Need a ServiceGatewayFactoryBase");
-            
-            appHost.Register<IServiceGatewayFactory>(new ServiceGatewayFactoryBaseDecorator(HeaderName, factoryBase));*/
+            if (factoryBase != null)
+                appHost.Register<IServiceGatewayFactory>(new ServiceGatewayFactoryBaseDecorator(HeaderName, factoryBase));
         }
     }
 }
