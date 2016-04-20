@@ -1,3 +1,7 @@
+# ServiceStack.Request.Correlation
+[![Build status](https://ci.appveyor.com/api/projects/status/h3mps66bduii6amq/branch/master?svg=true)](https://ci.appveyor.com/project/wwwlicious/servicestack-request-correlation/branch/master)
+[![NuGet version](https://badge.fury.io/nu/ServiceStack.Request.Correlation.svg)](https://badge.fury.io/nu/ServiceStack.Request.Correlation)
+
 A plugin for [ServiceStack](https://servicestack.net/) that creates a correlation id that allows requests to be tracked across multiple services.
 
 If no correlation id is found one is created and appended to incoming `IRequest` object, both as a header and in the `IRequest.Items` collection. The correlation id is then added to outgoing `IResponse` object.
@@ -5,12 +9,18 @@ If no correlation id is found one is created and appended to incoming `IRequest`
 If a correlation id already exists then this is appended to the outgoing response object.
 
 ## Quick Start
+
+Install the package [https://www.nuget.org/packages/ServiceStack.Request.Correlation](https://www.nuget.org/packages/ServiceStack.Request.Correlation/)
+```bash
+PM> Install-Package ServiceStack.Request.Correlation
+```
+
 The plugin is added like any other. By default it has no external dependencies that need to be provided.
 ```csharp
 Plugins.Add(new RequestCorrelationFeature());
 ```
 
-This will ensure an http header, x-mac-requestid, with a unique id is in every request/response.
+This will ensure an http header `x-mac-requestid` is added to requests with a unique id in every request/response.
 
 ### Customising
 Both the http header name (default: "x-mac-requestid") and request id generation method (default: [RustFlakes](https://github.com/peschkaj/rustflakes)) can be customised:
