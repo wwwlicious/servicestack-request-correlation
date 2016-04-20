@@ -4,7 +4,6 @@
 namespace ServiceStack.Request.Correlation.Extensions
 {
     using Web;
-    using System.Collections.Generic;
 
     public static class RequestExtensions
     {
