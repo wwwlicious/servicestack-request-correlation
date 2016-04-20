@@ -54,6 +54,17 @@ namespace ServiceStack.Request.Correlation.Tests
         }
 
         [Fact]
+        public void Register_AddsResponseFilter()
+        {
+            var appHost = A.Fake<IAppHost>();
+            appHost.GlobalResponseFilters.Count.Should().Be(0);
+
+            feature.Register(appHost);
+
+            appHost.GlobalResponseFilters.Count.Should().Be(1);
+        }
+
+        [Fact]
         public void HeaderName_HasDefaultValue()
         {
             var testFeature = new RequestCorrelationFeature();
@@ -90,9 +101,33 @@ namespace ServiceStack.Request.Correlation.Tests
         }
 
         [Fact]
-        public void ProcessRequest_SetsNewIdOnRequest_IfNotProvided()
+        public void ProcessRequest_SetsNewIdOnRequestHeader_IfNotProvided()
         {
             var mockHttpRequest = new MockHttpRequest();
+
+            feature.ProcessRequest(mockHttpRequest, new MockHttpResponse());
+
+            mockHttpRequest.Headers[feature.HeaderName].Should().Be(newId);
+        }
+
+        [Fact]
+        public void ProcessRequest_AddsNewIdOnRequestItems_IfNotProvided()
+        {
+            var mockHttpRequest = new MockHttpRequest();
+
+            feature.ProcessRequest(mockHttpRequest, new MockHttpResponse());
+
+            mockHttpRequest.Items[feature.HeaderName].ToString().Should().Be(newId);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData(" ")]
+        public void ProcessRequest_SetsNewIdOnRequestHeader_IfProvidedButEmpty(string requestId)
+        {
+            var mockHttpRequest = new MockHttpRequest();
+            mockHttpRequest.Headers[feature.HeaderName] = requestId;
 
             feature.ProcessRequest(mockHttpRequest, new MockHttpResponse());
 
@@ -103,14 +138,14 @@ namespace ServiceStack.Request.Correlation.Tests
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
-        public void ProcessRequest_SetsNewIdOnRequest_IfProvidedButEmpty(string requestId)
+        public void ProcessRequest_SetsNewIdOnRequestItems_IfProvidedButEmpty(string requestId)
         {
             var mockHttpRequest = new MockHttpRequest();
             mockHttpRequest.Headers[feature.HeaderName] = requestId;
 
             feature.ProcessRequest(mockHttpRequest, new MockHttpResponse());
 
-            mockHttpRequest.Headers[feature.HeaderName].Should().Be(newId);
+            mockHttpRequest.Items[feature.HeaderName].Should().Be(newId);
         }
 
         [Theory, InlineAutoData]
@@ -124,36 +159,68 @@ namespace ServiceStack.Request.Correlation.Tests
             mockHttpRequest.Headers[feature.HeaderName].Should().Be(requestId);
         }
 
-        [Fact]
-        public void ProcessRequest_SetsHeaderOnResponse()
-        {
-            var mockHttpResponse = new MockHttpResponse();
-
-            feature.ProcessRequest(new MockHttpRequest(), mockHttpResponse);
-
-            mockHttpResponse.Headers[feature.HeaderName].Should().NotBeNullOrEmpty();
-        }
-
-        [Fact]
-        public void ProcessRequest_SetsNewIdOnResponse_IfNotProvidedInRequest()
-        {
-            var mockHttpResponse = new MockHttpResponse();
-
-            feature.ProcessRequest(new MockHttpRequest(), mockHttpResponse);
-
-            mockHttpResponse.Headers[feature.HeaderName].Should().Be(newId);
-        }
-
         [Theory, InlineAutoData]
-        public void ProcessRequest_SetsIdOnResponse_IfNotInRequest(string requestId)
+        public void SetResponseCorrelationId_SetsIdOnResponse_IfInRequest(string requestId)
         {
             var mockHttpResponse = new MockHttpResponse();
             var mockHttpRequest = new MockHttpRequest();
             mockHttpRequest.Headers[feature.HeaderName] = requestId;
 
-            feature.ProcessRequest(mockHttpRequest, mockHttpResponse);
+            feature.SetResponseCorrelationId(mockHttpRequest, mockHttpResponse, 1);
 
             mockHttpResponse.Headers[feature.HeaderName].Should().Be(requestId);
+        }
+
+        [Fact]
+        public void AfterPluginsLoaded_GetsIServiceGatewayFactory_FromContainer()
+        {
+            var appHost = A.Fake<IAppHost>();
+
+            feature.AfterPluginsLoaded(appHost);
+
+            A.CallTo(() => appHost.TryResolve<IServiceGatewayFactory>()).MustHaveHappened();
+        }
+
+        [Fact]
+        public void AfterPluginsLoaded_RegistersDecorator_IfIServiceGatewayFactory_IsServiceGatewayFactoryBase()
+        {
+            var appHost = A.Fake<IAppHost>();
+            A.CallTo(() => appHost.TryResolve<IServiceGatewayFactory>()).Returns(new TestServiceGatewayFactory());
+
+            feature.AfterPluginsLoaded(appHost);
+            
+            A.CallTo(() =>
+                    appHost.Register<IServiceGatewayFactory>(
+                        A<IServiceGatewayFactory>.That.Matches(g => g.GetType() == typeof(ServiceGatewayFactoryBaseDecorator))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public void AfterPluginsLoaded_DoesNotRegistersDecorator_IfIServiceGatewayFactory_IsNotServiceGatewayFactoryBase()
+        {
+            var appHost = A.Fake<IAppHost>();
+            A.CallTo(() => appHost.TryResolve<IServiceGatewayFactory>()).Returns(new BasicServiceGatewayFactory());
+
+            feature.AfterPluginsLoaded(appHost);
+
+            A.CallTo(() => appHost.Register<IServiceGatewayFactory>(A<IServiceGatewayFactory>.Ignored))
+                .MustNotHaveHappened();
+        }
+    }
+
+    public class TestServiceGatewayFactory : ServiceGatewayFactoryBase
+    {
+        public override IServiceGateway GetGateway(Type requestType)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BasicServiceGatewayFactory : IServiceGatewayFactory
+    {
+        public IServiceGateway GetServiceGateway(IRequest request)
+        {
+            throw new NotImplementedException();
         }
     }
 }

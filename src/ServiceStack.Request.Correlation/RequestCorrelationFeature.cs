@@ -3,48 +3,58 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 namespace ServiceStack.Request.Correlation
 {
+    using Extensions;
     using Interfaces;
+    using Logging;
     using ServiceStack;
     using Web;
 
-    public class RequestCorrelationFeature : IPlugin
+    public class RequestCorrelationFeature : IPlugin, IPostInitPlugin
     {
         public string HeaderName { get; set; } = "x-mac-requestId";
 
         public IIdentityGenerator IdentityGenerator { get; set; } = new RustflakesIdentityGenerator();
 
+        private readonly ILog log = LogManager.GetLogger(typeof(RequestCorrelationFeature));
+
         public void Register(IAppHost appHost)
         {
             appHost.PreRequestFilters.InsertAsFirst(ProcessRequest);
+
+            appHost.GlobalResponseFilters.Add(SetResponseCorrelationId);
         }
 
         public virtual void ProcessRequest(IRequest request, IResponse response)
         {
             // Check for existence of header. If not there add it in
-            var requestId = request.Headers[HeaderName];
-            if (string.IsNullOrWhiteSpace(requestId))
+            var correlationId = request.GetCorrelationId(HeaderName);
+            log.Debug($"Got correlation Id {correlationId ?? "<notFound>" } with key {HeaderName} from incoming request object");
+            if (string.IsNullOrWhiteSpace(correlationId))
             {
-                requestId = SetRequestId(request);
+                correlationId = IdentityGenerator.GenerateIdentity();
+                request.Headers[HeaderName] = correlationId;
+                log.Debug($"Generated new correlation Id {correlationId} for key {HeaderName} on incoming request object");
             }
 
-            SetResponseId(response, requestId);
+            request.Items[HeaderName] = correlationId;
         }
 
-        private string SetRequestId(IRequest request)
+        public virtual void SetResponseCorrelationId(IRequest request, IResponse response, object dto)
         {
-            var requestId = GenerateRequestId();
-            request.Headers[HeaderName] = requestId;
-            return requestId;
+            var correlationId = request.GetCorrelationId(HeaderName);
+            log.Debug($"Setting correlation Id {correlationId} to header {HeaderName} on response object");
+
+            response.AddHeader(HeaderName, correlationId);
         }
 
-        private void SetResponseId(IResponse response, string requestId)
+        public void AfterPluginsLoaded(IAppHost appHost)
         {
-            response.AddHeader(HeaderName, requestId);
-        }
+            // Check if an IServiceGatewayFactory has been registered
+            var factory = appHost.TryResolve<IServiceGatewayFactory>();
 
-        private string GenerateRequestId()
-        {
-            return IdentityGenerator.GenerateIdentity();
+            var factoryBase = factory as ServiceGatewayFactoryBase;
+            if (factoryBase != null)
+                appHost.Register<IServiceGatewayFactory>(new ServiceGatewayFactoryBaseDecorator(HeaderName, factoryBase));
         }
     }
 }

@@ -12,9 +12,8 @@
     <tags>servicestack request correlation microservices</tags>
     <releaseNotes>See github project for details</releaseNotes>
     <dependencies>
-      <dependency id="ServiceStack" version="[4.0.54, 5)" />
-      <dependency id="ServiceStack.Client" version="[4.0.54, 5)" />
-      <dependency id="ServiceStack.Interfacesgit  " version="[4.0.54, 5)" />
+      <dependency id="ServiceStack.Server" version="[4.0.56, 5)" />
+      <dependency id="RustFlakes" version="1.4.1" />
     </dependencies>
   </metadata>
 </package>

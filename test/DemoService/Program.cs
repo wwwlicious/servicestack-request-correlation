@@ -7,9 +7,11 @@ namespace DemoService
     using System.Diagnostics;
     using Funq;
     using ServiceStack;
+    using ServiceStack.Logging;
     using ServiceStack.Request.Correlation;
     using ServiceStack.Request.Correlation.Interfaces;
     using ServiceStack.Text;
+    using ServiceStack.Web;
 
     class Program
     {
@@ -41,42 +43,31 @@ namespace DemoService
                 ApiVersion = "2.0"
             });
 
-            // Default plugin with x-mac-requestId headername and Rustflakes generator
+            //LogManager.LogFactory = new ConsoleLogFactory();
+
+            // Register a ServiceGatewayFactory for making 'external' calls
+            Container.Register<IServiceGatewayFactory>(x => new MyGatewayFactory()).ReusedWithin(ReuseScope.None);
+
+            // Default plugin with 'x-mac-requestId' headername and Rustflakes generator
             // Plugins.Add(new RequestCorrelationFeature());
 
             // Customised plugin
             Plugins.Add(new RequestCorrelationFeature
             {
-                HeaderName = HeaderNames.RequestId,
-                IdentityGenerator = new DateTimeIdentityGenerator()
+                HeaderName = HeaderNames.CorrelationId,
+                IdentityGenerator = new IncrementingIdentityGenerator()
             });
         }
-    }
-
-    public class DemoService : Service
-    {
-        public object Any(DemoRequest demoRequest)
-        {
-            var header = Request.Headers[HeaderNames.RequestId];
-
-            $"Demo service received request with {header} value for {HeaderNames.RequestId} header".Print();
-
-            return new DemoResponse { Message = $"Request id = {header}" };
-        }
-    }
-
-    public class DemoRequest : IReturn<DemoResponse>
-    {
     }
 
     public class DemoResponse
     {
         public string Message { get; set; }
     }
-
+    
     public static class HeaderNames
     {
-        public const string RequestId = "x-my-requestId";
+        public const string CorrelationId = "x-my-requestId";
     }
 
     public class DateTimeIdentityGenerator : IIdentityGenerator
@@ -84,6 +75,15 @@ namespace DemoService
         public string GenerateIdentity()
         {
             return DateTime.Now.ToString("O");
+        }
+    }
+
+    public class IncrementingIdentityGenerator : IIdentityGenerator
+    {
+        private int count;
+        public string GenerateIdentity()
+        {
+            return (++count).ToString();
         }
     }
 }
