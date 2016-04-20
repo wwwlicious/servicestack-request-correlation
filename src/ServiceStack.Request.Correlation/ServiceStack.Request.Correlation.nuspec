@@ -5,7 +5,7 @@
     <version>$version$</version>
     <authors>Donald Gray (@donaldgray)</authors>
     <description>Plugin for ServiceStack that ensures there's a unique request correlation Id in header</description>
-    <projectUrl></projectUrl>
+      <projectUrl>https://github.com/MacLeanElectrical/servicestack-request-correlation</projectUrl>
     <licenseUrl>https://opensource.org/licenses/MPL-2.0</licenseUrl>
     <iconUrl>https://servicestack.net/img/logo-32.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
