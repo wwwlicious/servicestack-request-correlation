@@ -7,7 +7,6 @@ namespace ServiceStack.Request.Correlation.Tests
     using FakeItEasy;
     using FluentAssertions;
     using Interfaces;
-    using Ploeh.AutoFixture.Xunit2;
     using ServiceStack;
     using Testing;
     using Web;
@@ -148,9 +147,10 @@ namespace ServiceStack.Request.Correlation.Tests
             mockHttpRequest.Items[feature.HeaderName].Should().Be(newId);
         }
 
-        [Theory, InlineAutoData]
-        public void ProcessRequest_DoesNotChangeHeaderOnRequest_IfProvided(string requestId)
+        [Fact]
+        public void ProcessRequest_DoesNotChangeHeaderOnRequest_IfProvided()
         {
+            var requestId = Guid.NewGuid().ToString();
             var mockHttpRequest = new MockHttpRequest();
             mockHttpRequest.Headers[feature.HeaderName] = requestId;
 
@@ -159,9 +159,10 @@ namespace ServiceStack.Request.Correlation.Tests
             mockHttpRequest.Headers[feature.HeaderName].Should().Be(requestId);
         }
 
-        [Theory, InlineAutoData]
-        public void SetResponseCorrelationId_SetsIdOnResponse_IfInRequest(string requestId)
+        [Fact]
+        public void SetResponseCorrelationId_SetsIdOnResponse_IfInRequest()
         {
+            var requestId = Guid.NewGuid().ToString();
             var mockHttpResponse = new MockHttpResponse();
             var mockHttpRequest = new MockHttpRequest();
             mockHttpRequest.Headers[feature.HeaderName] = requestId;
