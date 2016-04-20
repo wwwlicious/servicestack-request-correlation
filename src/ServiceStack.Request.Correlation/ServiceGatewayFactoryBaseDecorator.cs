@@ -1,6 +1,11 @@
-﻿namespace ServiceStack.Request.Correlation
+﻿// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this 
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace ServiceStack.Request.Correlation
 {
     using System;
+    using Extensions;
     using Logging;
     using Web;
 
@@ -19,7 +24,7 @@
 
         public override IServiceGateway GetServiceGateway(IRequest request)
         {
-            correlationId = request.Headers[headerName] ?? request.Items[headerName].ToString();
+            correlationId = request.GetCorrelationId(headerName);
 
             // This call needs to be made to ensure the internal localGateway is setup
             gatewayFactory.GetServiceGateway(request);

@@ -92,7 +92,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CollectionExtensionsTests.cs" />
+    <Compile Include="Extensions\CollectionExtensionsTests.cs" />
+    <Compile Include="Extensions\RequestExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestCorrelationFeatureTests.cs" />
     <Compile Include="RustFlakesIdentityGeneratorTests.cs" />

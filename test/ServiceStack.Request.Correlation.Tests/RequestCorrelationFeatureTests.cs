@@ -170,5 +170,57 @@ namespace ServiceStack.Request.Correlation.Tests
 
             mockHttpResponse.Headers[feature.HeaderName].Should().Be(requestId);
         }
+
+        [Fact]
+        public void AfterPluginsLoaded_GetsIServiceGatewayFactory_FromContainer()
+        {
+            var appHost = A.Fake<IAppHost>();
+
+            feature.AfterPluginsLoaded(appHost);
+
+            A.CallTo(() => appHost.TryResolve<IServiceGatewayFactory>()).MustHaveHappened();
+        }
+
+        [Fact]
+        public void AfterPluginsLoaded_RegistersDecorator_IfIServiceGatewayFactory_IsServiceGatewayFactoryBase()
+        {
+            var appHost = A.Fake<IAppHost>();
+            A.CallTo(() => appHost.TryResolve<IServiceGatewayFactory>()).Returns(new TestServiceGatewayFactory());
+
+            feature.AfterPluginsLoaded(appHost);
+            
+            A.CallTo(() =>
+                    appHost.Register<IServiceGatewayFactory>(
+                        A<IServiceGatewayFactory>.That.Matches(g => g.GetType() == typeof(ServiceGatewayFactoryBaseDecorator))))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public void AfterPluginsLoaded_DoesNotRegistersDecorator_IfIServiceGatewayFactory_IsNotServiceGatewayFactoryBase()
+        {
+            var appHost = A.Fake<IAppHost>();
+            A.CallTo(() => appHost.TryResolve<IServiceGatewayFactory>()).Returns(new BasicServiceGatewayFactory());
+
+            feature.AfterPluginsLoaded(appHost);
+
+            A.CallTo(() => appHost.Register<IServiceGatewayFactory>(A<IServiceGatewayFactory>.Ignored))
+                .MustNotHaveHappened();
+        }
+    }
+
+    public class TestServiceGatewayFactory : ServiceGatewayFactoryBase
+    {
+        public override IServiceGateway GetGateway(Type requestType)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class BasicServiceGatewayFactory : IServiceGatewayFactory
+    {
+        public IServiceGateway GetServiceGateway(IRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
