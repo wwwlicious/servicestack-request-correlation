@@ -45,6 +45,7 @@ namespace DemoService
 
             LogManager.LogFactory = new ConsoleLogFactory();
 
+            // Need to register a ServiceGatewayFactory or it falls over
             Container.Register<IServiceGatewayFactory>(x => new MyGatewayFactory()).ReusedWithin(ReuseScope.None);
 
             // Default plugin with x-mac-requestId headername and Rustflakes generator
@@ -53,7 +54,7 @@ namespace DemoService
             // Customised plugin
             Plugins.Add(new RequestCorrelationFeature
             {
-                HeaderName = HeaderNames.RequestId,
+                HeaderName = HeaderNames.CorrelationId,
                 IdentityGenerator = new IncrementingIdentityGenerator()
             });
         }
@@ -79,9 +80,11 @@ namespace DemoService
     {
         public object Any(DemoRequest demoRequest)
         {
-            var header = Request.Headers[HeaderNames.RequestId];
+            var header = Request.Headers[HeaderNames.CorrelationId];
 
-            $"Demo service received request with {header} value for {HeaderNames.RequestId} header".Print();
+            // Request.Items[HeaderNames.CorrelationId]
+
+            $"Demo service received request with {header} value for {HeaderNames.CorrelationId} header".Print();
 
             return new DemoResponse { Message = $"Internal request id = {header}" };
         }
@@ -100,9 +103,9 @@ namespace DemoService
     {
         public object Any(DemoExternalRequest demoRequest)
         {
-            var header = Request.Headers[HeaderNames.RequestId];
+            var header = Request.Headers[HeaderNames.CorrelationId];
 
-            $"Demo service received external request with {header} value for {HeaderNames.RequestId} header".Print();
+            $"Demo service received external request with {header} value for {HeaderNames.CorrelationId} header".Print();
 
             return new DemoResponse { Message = $"External request id = {header}" };
         }
@@ -114,7 +117,7 @@ namespace DemoService
 
     public static class HeaderNames
     {
-        public const string RequestId = "x-my-requestId";
+        public const string CorrelationId = "x-my-requestId";
     }
 
     public class DateTimeIdentityGenerator : IIdentityGenerator
@@ -134,10 +137,11 @@ namespace DemoService
         }
     }
 
-    public class MyGatewayFactory : ServiceStack.ServiceGatewayFactoryBase
+    public class MyGatewayFactory : ServiceGatewayFactoryBase
     {
-        public override ServiceStack.IServiceGateway GetGateway(Type requestType)
+        public override IServiceGateway GetGateway(Type requestType)
         {
+            // If dto contains "External" then make an external request to it, else inProc
             var gateway = requestType.Name.Contains("External")
             ? new JsonServiceClient("http://127.0.0.1:8090/")
             : (IServiceGateway)localGateway;

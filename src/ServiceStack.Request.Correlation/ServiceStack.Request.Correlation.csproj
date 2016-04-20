@@ -64,6 +64,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestCorrelationFeature.cs" />
     <Compile Include="RustflakesIdentityGenerator.cs" />
+    <Compile Include="ServiceGatewayFactoryBaseDecorator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
