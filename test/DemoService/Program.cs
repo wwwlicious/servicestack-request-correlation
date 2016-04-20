@@ -11,6 +11,7 @@ namespace DemoService
     using ServiceStack.Request.Correlation;
     using ServiceStack.Request.Correlation.Interfaces;
     using ServiceStack.Text;
+    using ServiceStack.Web;
 
     class Program
     {
@@ -42,12 +43,12 @@ namespace DemoService
                 ApiVersion = "2.0"
             });
 
-            LogManager.LogFactory = new ConsoleLogFactory();
+            //LogManager.LogFactory = new ConsoleLogFactory();
 
-            // Need to register a ServiceGatewayFactory or it falls over
-            //Container.Register<IServiceGatewayFactory>(x => new MyGatewayFactory()).ReusedWithin(ReuseScope.None);
+            // Register a ServiceGatewayFactory for making 'external' calls
+            Container.Register<IServiceGatewayFactory>(x => new MyGatewayFactory()).ReusedWithin(ReuseScope.None);
 
-            // Default plugin with x-mac-requestId headername and Rustflakes generator
+            // Default plugin with 'x-mac-requestId' headername and Rustflakes generator
             // Plugins.Add(new RequestCorrelationFeature());
 
             // Customised plugin
@@ -58,7 +59,6 @@ namespace DemoService
             });
         }
     }
-
 
     public class DemoResponse
     {
