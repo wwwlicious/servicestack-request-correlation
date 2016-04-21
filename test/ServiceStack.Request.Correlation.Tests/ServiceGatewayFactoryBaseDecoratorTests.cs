@@ -88,11 +88,13 @@ namespace ServiceStack.Request.Correlation.Tests
             SetCorrelationId();
             var type = typeof(int);
 
-            var jsonClient = new JsonServiceClient();
-            A.CallTo(() => decorated.GetGateway(type)).Returns(jsonClient);
+            // The code checks for IRestClient but IServiceClient implements this, and also implemetns IServiceGateway
+            var client = A.Fake<IServiceClient>();
+            A.CallTo(() => decorated.GetGateway(type)).Returns(client);
 
             gateway.GetGateway(type);
-            jsonClient.Headers[HeaderName].Should().Be(correlationId);
+
+            A.CallTo(() => client.AddHeader(HeaderName, correlationId)).MustHaveHappened();
         }
 
         private void SetCorrelationId()

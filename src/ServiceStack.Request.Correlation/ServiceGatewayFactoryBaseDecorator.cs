@@ -40,16 +40,16 @@ namespace ServiceStack.Request.Correlation
                 return serviceGateway;
             }
 
-            var serviceClientBase = serviceGateway as ServiceClientBase;
-            if (serviceClientBase == null)
+            var restClient = serviceGateway as IRestClient;
+            if (restClient == null)
             {
                 // Internal call, no need to do anything as using same request/response objects
                 return serviceGateway;
             }
 
             // External call, add this to the headers collection to be added to outgoing request object
-            serviceClientBase.Headers.Set(headerName, correlationId);
-            return serviceClientBase;
+            restClient.AddHeader(headerName, correlationId);
+            return serviceGateway;
         }
     }
 }
