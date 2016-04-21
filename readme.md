@@ -58,7 +58,7 @@ The plugin registers a [`PreRequestFilter`](https://github.com/ServiceStack/Serv
 A [`GlobalResponseFilter`](https://github.com/ServiceStack/ServiceStack/wiki/Order-of-Operations) is used to append the correlation id to any outgoing `IResponse` objects.
 
 ### Internal and External calls
-To support persisting the correlation id across external calls, on `AfterPluginsLoaded` the plugin checks to see if there is an `IServiceGatewayFactory` registered in the IoC container. If there is, and it is also an `ServiceGatewayFactoryBase`, then it registers a decorator, `ServiceGatewayFactoryBaseDecorator`, to add the correlation id to any outgoing external requests made via anything implementing `ServiceClientBase`, (e.g. `JsonServiceClient` or `JsvServiceClient`).
+To support persisting the correlation id across external calls, on `AfterPluginsLoaded` the plugin checks to see if there is an `IServiceGatewayFactory` registered in the IoC container. If there is, and it is also an `ServiceGatewayFactoryBase`, then it registers a decorator, `ServiceGatewayFactoryBaseDecorator`, to add the correlation id to any outgoing external requests made via anything implementing `IRestClient`, (e.g. `JsonServiceClient` or `JsvServiceClient`).
 
 If the call is internal then the same `IRequest` object will be used so the correlation id will already be present.
 
