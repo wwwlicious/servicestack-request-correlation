@@ -9,8 +9,9 @@ namespace ServiceStack.Request.Correlation.Tests
     using Testing;
     using Xunit;
 
-    public class ServiceGatewayFactoryBaseDecoratorTests
+    public class ServiceGatewayFactoryBaseDecoratorTests : IDisposable
     {
+        private readonly ServiceStackHost appHost;
         private readonly ServiceGatewayFactoryBaseDecorator gateway;
         private readonly ServiceGatewayFactoryBase decorated;
         private const string HeaderName = "x-correlation-id";
@@ -18,8 +19,14 @@ namespace ServiceStack.Request.Correlation.Tests
 
         public ServiceGatewayFactoryBaseDecoratorTests()
         {
+            appHost = new BasicAppHost().Init();
             decorated = A.Fake<ServiceGatewayFactoryBase>();
             gateway = new ServiceGatewayFactoryBaseDecorator(HeaderName, decorated);
+        }
+
+        public void Dispose()
+        {
+            appHost.Dispose();
         }
 
         [Theory]
