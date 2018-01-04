@@ -9,12 +9,24 @@ namespace ServiceStack.Request.Correlation.Tests.Extensions
     using Testing;
     using Xunit;
 
-    public class RequestExtensionsTests
+    public class RequestExtensionsTests : IDisposable
     {
+        private ServiceStackHost appHost;
+        
         private const string headerName = "x-correlationId";
         private readonly string headerValue = Guid.NewGuid().ToString();
         private readonly string itemValue = Guid.NewGuid().ToString();
 
+        public RequestExtensionsTests()
+        {
+            appHost = new BasicAppHost().Init();
+        }
+ 
+        public void Dispose()
+        {
+            appHost.Dispose();
+        }
+        
         [Fact]
         public void GetCorrelationId_ReturnsNull_IfNotSet()
         {

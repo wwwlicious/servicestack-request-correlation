@@ -11,25 +11,32 @@ namespace ServiceStack.Request.Correlation.Tests
     using Testing;
     using Web;
     using Xunit;
-
+    
     [Collection("RequestCorrelationTests")]
-    public class RequestCorrelationFeatureTests
+    public class RequestCorrelationFeatureTests : IDisposable
     {
         private readonly RequestCorrelationFeature feature;
         private readonly IIdentityGenerator generator;
         private readonly string newId = Guid.NewGuid().ToString();
+        private readonly ServiceStackHost appHost;
 
         public RequestCorrelationFeatureTests()
         {
+            appHost = new BasicAppHost().Init();
             generator = A.Fake<IIdentityGenerator>();
             A.CallTo(() => generator.GenerateIdentity()).Returns(newId);
             feature = new RequestCorrelationFeature { IdentityGenerator = generator };
         }
 
+        public void Dispose()
+        {
+            appHost.Dispose();
+        }
+
         [Fact]
         public void Register_AddsPreRequestFilter()
         {
-            var appHost = A.Fake<IAppHost>();
+//            var appHost = A.Fake<IAppHost>();
             appHost.PreRequestFilters.Count.Should().Be(0);
 
             feature.Register(appHost);
@@ -40,7 +47,7 @@ namespace ServiceStack.Request.Correlation.Tests
         [Fact]
         public void Register_AddsPreRequestFilter_AtPosition0()
         {
-            var appHost = A.Fake<IAppHost>();
+//            var appHost = A.Fake<IAppHost>();
             Action<IRequest, IResponse> myDelegate = (request, response) => { };
 
             // Add delegate at position 0
@@ -55,7 +62,7 @@ namespace ServiceStack.Request.Correlation.Tests
         [Fact]
         public void Register_AddsResponseFilter()
         {
-            var appHost = A.Fake<IAppHost>();
+//            var appHost = A.Fake<IAppHost>();
             appHost.GlobalResponseFilters.Count.Should().Be(0);
 
             feature.Register(appHost);
