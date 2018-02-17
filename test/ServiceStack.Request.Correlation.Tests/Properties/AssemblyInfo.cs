@@ -8,7 +8,7 @@ using Xunit;
 [assembly: AssemblyTitle("ServiceStack.Request.Correlation.Tests")]
 [assembly: AssemblyDescription("Unit tests for ServiceStack.Request.Correlation project")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("MacLean Electrical")]
+[assembly: AssemblyCompany("wwwlicious")]
 [assembly: AssemblyProduct("ServiceStack.Request.Correlation.Tests")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
