@@ -7,12 +7,12 @@ namespace ServiceStack.Request.Correlation
     using Interfaces;
     using RustFlakes;
 
-    public class RustflakesIdentityGenerator : IIdentityGenerator
+    public class RustFlakesIdentityGenerator : IIdentityGenerator
     {
         // NOTE DecimalOxidation is not the fastest nor smallest but happy medium
         private readonly DecimalOxidation generator;
 
-        public RustflakesIdentityGenerator()
+        public RustFlakesIdentityGenerator()
         {
             var machineIdentifier = MachineIdentity.GetMachineIdentifier();
             generator = new DecimalOxidation(machineIdentifier);

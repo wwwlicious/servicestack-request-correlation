@@ -46,7 +46,7 @@ namespace DemoService
             //LogManager.LogFactory = new ConsoleLogFactory();
 
             // Register a ServiceGatewayFactory for making 'external' calls
-            Container.Register<IServiceGatewayFactory>(x => new MyGatewayFactory()).ReusedWithin(ReuseScope.None);
+            Container.RegisterFactory<IServiceGatewayFactory>(() => new MyGatewayFactory()).ReusedWithin(ReuseScope.None);
 
             // Default plugin with 'x-mac-requestId' headername and Rustflakes generator
             // Plugins.Add(new RequestCorrelationFeature());

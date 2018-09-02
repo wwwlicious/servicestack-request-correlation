@@ -10,11 +10,9 @@ namespace ServiceStack.Request.Correlation.Extensions
         public static string GetCorrelationId(this IRequest request, string headerName)
         {
             var correlationId = request.Headers[headerName];
-
             if (string.IsNullOrWhiteSpace(correlationId))
             {
-                object correlationObj;
-                return request.Items.TryGetValue(headerName, out correlationObj) ? correlationObj.ToString() : null;
+                return request.Items.TryGetValue(headerName, out var correlationObj) ? correlationObj.ToString() : null;
             }
 
             return correlationId;

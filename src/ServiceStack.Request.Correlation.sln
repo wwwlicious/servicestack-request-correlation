@@ -9,9 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{1B21B7CF-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{16BD1096-59FD-420E-896B-048D6BEDAAB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Request.Correlation.Tests", "..\test\ServiceStack.Request.Correlation.Tests\ServiceStack.Request.Correlation.Tests.csproj", "{DF483953-95AA-4849-B500-A5A995C89130}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Request.Correlation.Tests", "test\ServiceStack.Request.Correlation.Tests\ServiceStack.Request.Correlation.Tests.csproj", "{DF483953-95AA-4849-B500-A5A995C89130}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoService", "..\test\DemoService\DemoService.csproj", "{F7792FC8-9CF9-488B-864D-865D55C2BBB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoService", "test\DemoService\DemoService.csproj", "{F7792FC8-9CF9-488B-864D-865D55C2BBB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,10 +6,12 @@ namespace ServiceStack.Request.Correlation.Tests.Extensions
     using System;
     using Correlation.Extensions;
     using FluentAssertions;
+    using ServiceStack.Configuration.Consul.Tests.Fixtures;
     using Testing;
     using Xunit;
 
-    public class RequestExtensionsTests : IDisposable
+    [Collection("AppHost")]
+    public class RequestExtensionsTests
     {
         private ServiceStackHost appHost;
         
@@ -17,14 +19,9 @@ namespace ServiceStack.Request.Correlation.Tests.Extensions
         private readonly string headerValue = Guid.NewGuid().ToString();
         private readonly string itemValue = Guid.NewGuid().ToString();
 
-        public RequestExtensionsTests()
+        public RequestExtensionsTests(AppHostFixture fixture)
         {
-            appHost = new BasicAppHost().Init();
-        }
- 
-        public void Dispose()
-        {
-            appHost.Dispose();
+            appHost = fixture.AppHost;
         }
         
         [Fact]

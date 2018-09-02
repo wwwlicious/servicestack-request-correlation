@@ -62,7 +62,7 @@ namespace ServiceStack.Request.Correlation
             foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
             {
                 // discard because of standard reasons
-                if (IsLookbackOrTunnel(ni))
+                if (IsLoopBackOrTunnel(ni))
                     continue;
 
                 // discard virtual cards (virtual box, virtual pc, etc.)
@@ -86,7 +86,7 @@ namespace ServiceStack.Request.Correlation
             return null;
         }
 
-        private static bool IsLookbackOrTunnel(NetworkInterface ni)
+        private static bool IsLoopBackOrTunnel(NetworkInterface ni)
         {
             return (ni.NetworkInterfaceType == NetworkInterfaceType.Loopback) ||
                    (ni.NetworkInterfaceType == NetworkInterfaceType.Tunnel);
