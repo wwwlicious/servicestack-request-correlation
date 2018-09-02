@@ -40,8 +40,7 @@ namespace ServiceStack.Request.Correlation
                 return serviceGateway;
             }
 
-            var restClient = serviceGateway as IRestClient;
-            if (restClient == null)
+            if (!(serviceGateway is IRestClient restClient))
             {
                 // Internal call, no need to do anything as using same request/response objects
                 return serviceGateway;

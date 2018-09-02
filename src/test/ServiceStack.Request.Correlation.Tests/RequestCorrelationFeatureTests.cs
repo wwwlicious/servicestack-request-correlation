@@ -8,35 +8,30 @@ namespace ServiceStack.Request.Correlation.Tests
     using FluentAssertions;
     using Interfaces;
     using ServiceStack;
+    using ServiceStack.Configuration.Consul.Tests.Fixtures;
     using Testing;
     using Web;
     using Xunit;
     
-    [Collection("RequestCorrelationTests")]
-    public class RequestCorrelationFeatureTests : IDisposable
+    [Collection("AppHost")]
+    public class RequestCorrelationFeatureTests
     {
         private readonly RequestCorrelationFeature feature;
         private readonly IIdentityGenerator generator;
         private readonly string newId = Guid.NewGuid().ToString();
         private readonly ServiceStackHost appHost;
 
-        public RequestCorrelationFeatureTests()
+        public RequestCorrelationFeatureTests(AppHostFixture fixture)
         {
-            appHost = new BasicAppHost().Init();
+            appHost = fixture.AppHost;
             generator = A.Fake<IIdentityGenerator>();
             A.CallTo(() => generator.GenerateIdentity()).Returns(newId);
             feature = new RequestCorrelationFeature { IdentityGenerator = generator };
         }
 
-        public void Dispose()
-        {
-            appHost.Dispose();
-        }
-
         [Fact]
         public void Register_AddsPreRequestFilter()
         {
-//            var appHost = A.Fake<IAppHost>();
             appHost.PreRequestFilters.Count.Should().Be(0);
 
             feature.Register(appHost);
@@ -47,7 +42,6 @@ namespace ServiceStack.Request.Correlation.Tests
         [Fact]
         public void Register_AddsPreRequestFilter_AtPosition0()
         {
-//            var appHost = A.Fake<IAppHost>();
             Action<IRequest, IResponse> myDelegate = (request, response) => { };
 
             // Add delegate at position 0
@@ -62,12 +56,11 @@ namespace ServiceStack.Request.Correlation.Tests
         [Fact]
         public void Register_AddsResponseFilter()
         {
-//            var appHost = A.Fake<IAppHost>();
-            appHost.GlobalResponseFilters.Count.Should().Be(0);
+            var filterCount = appHost.GlobalResponseFilters.Count;
 
             feature.Register(appHost);
 
-            appHost.GlobalResponseFilters.Count.Should().Be(1);
+            appHost.GlobalResponseFilters.Count.Should().Be(filterCount + 1);
         }
 
         [Fact]
@@ -78,10 +71,10 @@ namespace ServiceStack.Request.Correlation.Tests
         }
 
         [Fact]
-        public void IdentityGenerator_UsesRustflakesIdentityGeneratorByDefault()
+        public void IdentityGenerator_UsesRustFlakesIdentityGeneratorByDefault()
         {
             var testFeature = new RequestCorrelationFeature();
-            testFeature.IdentityGenerator.Should().BeOfType<RustflakesIdentityGenerator>();
+            testFeature.IdentityGenerator.Should().BeOfType<RustFlakesIdentityGenerator>();
         }
 
         [Fact]

@@ -6,10 +6,12 @@ namespace ServiceStack.Request.Correlation.Tests
     using System;
     using FakeItEasy;
     using FluentAssertions;
+    using ServiceStack.Configuration.Consul.Tests.Fixtures;
     using Testing;
     using Xunit;
 
-    public class ServiceGatewayFactoryBaseDecoratorTests : IDisposable
+    [Collection("AppHost")]
+    public class ServiceGatewayFactoryBaseDecoratorTests
     {
         private readonly ServiceStackHost appHost;
         private readonly ServiceGatewayFactoryBaseDecorator gateway;
@@ -17,16 +19,11 @@ namespace ServiceStack.Request.Correlation.Tests
         private const string HeaderName = "x-correlation-id";
         private readonly string correlationId = Guid.NewGuid().ToString();
 
-        public ServiceGatewayFactoryBaseDecoratorTests()
+        public ServiceGatewayFactoryBaseDecoratorTests(AppHostFixture fixture)
         {
-            appHost = new BasicAppHost().Init();
+            appHost = fixture.AppHost;
             decorated = A.Fake<ServiceGatewayFactoryBase>();
             gateway = new ServiceGatewayFactoryBaseDecorator(HeaderName, decorated);
-        }
-
-        public void Dispose()
-        {
-            appHost.Dispose();
         }
 
         [Theory]

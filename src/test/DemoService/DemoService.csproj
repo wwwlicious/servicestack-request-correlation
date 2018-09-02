@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <Configurations>Debug;Release</Configurations>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ServiceStack.Request.Correlation\ServiceStack.Request.Correlation.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ServiceStack.Server" Version="5.0.0" />
+  </ItemGroup>
+</Project>

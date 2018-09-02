@@ -7,13 +7,13 @@ namespace ServiceStack.Request.Correlation.Tests
     using FluentAssertions;
     using Xunit;
 
-    public class RustflakesIdentityGeneratorTests
+    public class RustFlakesIdentityGeneratorTests
     {
-        private readonly RustflakesIdentityGenerator generator;
+        private readonly RustFlakesIdentityGenerator generator;
 
-        public RustflakesIdentityGeneratorTests()
+        public RustFlakesIdentityGeneratorTests()
         {
-            generator = new RustflakesIdentityGenerator();
+            generator = new RustFlakesIdentityGenerator();
         }
 
         [Fact]

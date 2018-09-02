@@ -13,7 +13,7 @@ namespace ServiceStack.Request.Correlation
     {
         public string HeaderName { get; set; } = "x-mac-requestId";
 
-        public IIdentityGenerator IdentityGenerator { get; set; } = new RustflakesIdentityGenerator();
+        public IIdentityGenerator IdentityGenerator { get; set; } = new RustFlakesIdentityGenerator();
 
         private readonly ILog log = LogManager.GetLogger(typeof(RequestCorrelationFeature));
 
@@ -52,8 +52,7 @@ namespace ServiceStack.Request.Correlation
             // Check if an IServiceGatewayFactory has been registered
             var factory = appHost.TryResolve<IServiceGatewayFactory>();
 
-            var factoryBase = factory as ServiceGatewayFactoryBase;
-            if (factoryBase != null)
+            if (factory is ServiceGatewayFactoryBase factoryBase)
                 appHost.Register<IServiceGatewayFactory>(new ServiceGatewayFactoryBaseDecorator(HeaderName, factoryBase));
         }
     }

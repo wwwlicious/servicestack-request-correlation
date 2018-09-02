@@ -24,6 +24,8 @@ bld/
 
 # Visual Studio 2015 cache/options directory
 .vs/
+.vscode/
+.idea/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -41,6 +43,7 @@ dlldata.c
 # DNX
 project.lock.json
 artifacts/
+tools/
 
 *_i.c
 *_p.c
